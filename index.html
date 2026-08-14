@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Order Generator - Standard GST Grid Template</title>
+    <meta name="description" content="Generate official GST compliant Purchase Orders with HSN/SAC, boxed grid template, Amount in Words, and PDF export.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2pdf.js for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Navbar -->
+        <header class="app-header no-print">
+            <div class="logo-brand">
+                <div class="logo-icon"><i class="fa-solid fa-file-contract"></i></div>
+                <div>
+                    <h1>GST Purchase Order Builder</h1>
+                    <span class="tagline">Official Grid-Box Format Generator</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button type="button" class="btn btn-secondary" id="btnSampleData"><i class="fa-solid fa-wand-magic-sparkles"></i> Load Sample PO</button>
+                <button type="button" class="btn btn-outline" id="btnReset"><i class="fa-solid fa-rotate-left"></i> Reset Form</button>
+                <button type="button" class="btn btn-primary" id="btnDownloadPdf"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
+                <button type="button" class="btn btn-info" id="btnDownloadDoc" style="background-color: #0284c7; color: white;"><i class="fa-solid fa-file-word"></i> Download DOC</button>
+                <button type="button" class="btn btn-success" id="btnPrint"><i class="fa-solid fa-print"></i> Print PO</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Left Side: Interactive Form Controls -->
+            <section class="form-section no-print">
+                <form id="poForm" autocomplete="off">
+
+                    <!-- Section 1: PO Reference Details -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fa-solid fa-hashtag"></i> PO & Reference Info</h2>
+                        </div>
+                        <div class="card-body grid-2">
+                            <div class="form-group">
+                                <label for="refNo">Ref No. <span class="required">*</span></label>
+                                <div class="input-with-btn">
+                                    <input type="text" id="refNo" required placeholder="PO/ME/26-27/014">
+                                    <button type="button" id="btnGenRef" title="Generate Ref Number"><i class="fa-solid fa-arrows-rotate"></i></button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="poDate">Dated <span class="required">*</span></label>
+                                <input type="date" id="poDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="buyerOrderNo">Buyer's Order No.</label>
+                                <input type="text" id="buyerOrderNo" placeholder="ORD-2026-99">
+                            </div>
+                            <div class="form-group">
+                                <label for="buyerOrderDate">Buyer Order Date</label>
+                                <input type="date" id="buyerOrderDate">
+                            </div>
+                            <div class="form-group grid-span-2">
+                                <label for="poSubject">Subject <span class="required">*</span></label>
+                                <input type="text" id="poSubject" placeholder="Order for Supply of Paper Jharokha" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Supplier & Buyer Company Info -->
+                    <div class="card grid-2-card">
+                        <!-- Supplier (Bill from) -->
+                        <div class="sub-card">
+                            <div class="card-header">
+                                <h2><i class="fa-solid fa-industry"></i> Supplier (Bill from)</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="supplierName">Supplier Name <span class="required">*</span></label>
+                                    <input type="text" id="supplierName" placeholder="Mohini Enterprises" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="supplierAddress">Address & Pincode</label>
+                                    <textarea id="supplierAddress" rows="3" placeholder="Shahpur- Mubarakpur - Ladawali, Kokarpur, Moradabad&#10;244504 (U.P.)"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="supplierGstin">GSTIN / UIN</label>
+                                    <input type="text" id="supplierGstin" placeholder="09ALGPP0253R1ZJ">
+                                </div>
+                                <div class="form-group">
+                                    <label for="supplierMobile">Mobile / Phone No.</label>
+                                    <input type="text" id="supplierMobile" placeholder="7078663938 / 8194073656">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buyer / Ordering Company -->
+                        <div class="sub-card">
+                            <div class="card-header">
+                                <h2><i class="fa-solid fa-building"></i> Ordering Company (Buyer)</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="companyName">Company Name <span class="required">*</span></label>
+                                    <input type="text" id="companyName" placeholder="FOR HELP US GREEN LLP" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="logoFile">Company Logo (Center Top)</label>
+                                    <div class="input-with-btn">
+                                        <input type="file" id="logoFile" accept="image/*">
+                                        <button type="button" id="btnClearLogo" title="Remove Logo"><i class="fa-solid fa-xmark"></i></button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="companyAddress">Company Address</label>
+                                    <textarea id="companyAddress" rows="2" placeholder="C-8/3 SITE-1 Industrial Area Panki, Kanpur- 208022 Uttar Pradesh -India"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="companyGstin">Company GSTIN / UIN</label>
+                                    <input type="text" id="companyGstin" placeholder="09AAMFH5783P1ZC">
+                                </div>
+                                <div class="form-group">
+                                    <label for="companyEmail">Company Email</label>
+                                    <input type="email" id="companyEmail" placeholder="hello@helpusgreen.com">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Itemized Goods Table -->
+                    <div class="card">
+                        <div class="card-header flex-between">
+                            <h2><i class="fa-solid fa-boxes-packing"></i> Goods & Services</h2>
+                            <button type="button" class="btn btn-small btn-primary" id="btnAddRow"><i class="fa-solid fa-plus"></i> Add Line Item</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="items-edit-table" id="itemsTable">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 15%">No. & Kind Pkgs</th>
+                                            <th style="width: 35%">Description of Goods</th>
+                                            <th style="width: 15%">HSN/SAC</th>
+                                            <th style="width: 12%">Quantity</th>
+                                            <th style="width: 15%">Rate (₹)</th>
+                                            <th style="width: 8%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="itemsTableBody">
+                                        <!-- Edit rows injected via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Terms, Words & Signatory -->
+                    <div class="card grid-2-card">
+                        <div class="sub-card">
+                            <div class="card-header">
+                                <h2><i class="fa-solid fa-file-pen"></i> Terms & Words</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="amountWords">Amount Chargeable (in words)</label>
+                                    <input type="text" id="amountWords" placeholder="Ten Thousand Five Hundred E.&O.E">
+                                </div>
+                                <div class="form-group">
+                                    <label for="paymentTerms">Mode / Terms of Payment</label>
+                                    <input type="text" id="paymentTerms" placeholder="100% Advance / Net 15 Days">
+                                </div>
+                                <div class="form-group">
+                                    <label for="otherRef">Other References</label>
+                                    <input type="text" id="otherRef" placeholder="Delivery at Kanpur Warehouse">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sub-card">
+                            <div class="card-header">
+                                <h2><i class="fa-solid fa-signature"></i> Signatory Details</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="signatoryName">Authorised Signatory Name</label>
+                                    <input type="text" id="signatoryName" placeholder="Karan Rastogi">
+                                </div>
+                                <div class="form-group">
+                                    <label for="signatoryTitle">Signatory Designation / Title</label>
+                                    <input type="text" id="signatoryTitle" placeholder="Partner / Manager">
+                                </div>
+                                <div class="form-group">
+                                    <label for="signatureFile">Upload Signature Image (Optional)</label>
+                                    <div class="input-with-btn">
+                                        <input type="file" id="signatureFile" accept="image/*">
+                                        <button type="button" id="btnClearSig" title="Remove Signature"><i class="fa-solid fa-xmark"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </section>
+
+            <!-- Right Side: Real-time Exact Template Preview -->
+            <section class="preview-section">
+                <div class="preview-toolbar no-print">
+                    <span class="preview-title"><i class="fa-regular fa-eye"></i> Live Document Preview</span>
+                    <span class="preview-hint">Matches official GST Purchase Order format</span>
+                </div>
+
+                <!-- Printable Document Box -->
+                <div class="po-document-wrapper">
+                    <div class="po-document" id="poDocument">
+                        
+                        <!-- Top Center Logo & Title Header -->
+                        <div class="po-top-header text-center">
+                            <div id="previewLogoContainer" class="logo-preview-box" style="margin-bottom: 6px;">
+                                <img id="previewLogoImg" src="logo.png" alt="Company Logo" style="max-height: 60px; max-width: 200px; object-fit: contain;">
+                            </div>
+                            <h1 class="po-heading-title">PURCHASE ORDER</h1>
+                        </div>
+
+                        <!-- Main Outer Border Box -->
+                        <div class="gst-po-box">
+                            
+                            <!-- Header Grid Split into 2 Main Columns -->
+                            <div class="grid-table-row header-grid-row">
+                                <!-- Left Column: Supplier Bill From -->
+                                <div class="grid-cell cell-supplier">
+                                    <div class="cell-label">Supplier (Bill from)</div>
+                                    <div class="supplier-title" id="previewSupplierName">Mohini Enterprises</div>
+                                    <div class="supplier-text" id="previewSupplierAddress">Shahpur- Mubarakpur - Ladawali, Kokarpur, Moradabad<br>244504 (U.P.)</div>
+                                    <div class="supplier-gstin">GSTIN : <span id="previewSupplierGstin">09ALGPP0253R1ZJ</span></div>
+                                    <div class="supplier-mob">Mob:<span id="previewSupplierMobile">7078663938/8194073656</span></div>
+                                </div>
+
+                                <!-- Right Column: Reference & Order Meta sub-grid -->
+                                <div class="grid-cell cell-meta-wrapper">
+                                    <div class="meta-sub-row border-bottom">
+                                        <div class="meta-sub-cell border-right">
+                                            <div class="cell-label-inline">Ref:</div>
+                                            <div class="cell-val-inline" id="previewRefNo">PO/ME/26-27/014</div>
+                                        </div>
+                                        <div class="meta-sub-cell">
+                                            <div class="cell-label-inline">Dated:</div>
+                                            <div class="cell-val-inline" id="previewPoDate">13-AUG-2026</div>
+                                        </div>
+                                    </div>
+                                    <div class="meta-sub-row">
+                                        <div class="meta-sub-cell border-right">
+                                            <div class="cell-label-inline">Buyer's Order No.</div>
+                                            <div class="cell-val-inline" id="previewBuyerOrderNo">-</div>
+                                        </div>
+                                        <div class="meta-sub-cell">
+                                            <div class="cell-label-inline">Dated</div>
+                                            <div class="cell-val-inline" id="previewBuyerOrderDate">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Subject Header Bar -->
+                            <div class="grid-table-row subject-row border-top border-bottom">
+                                <div class="subject-content">
+                                    <strong>Subject:</strong> <span id="previewPoSubject">Order for Supply of Paper Jharokha</span>
+                                </div>
+                            </div>
+
+                            <!-- Items Table Grid -->
+                            <div class="gst-items-table-wrapper">
+                                <table class="gst-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 7%" class="text-center">Sl. No.</th>
+                                            <th style="width: 18%">No. &Kind of Pkgs.</th>
+                                            <th style="width: 43%">Description of Goods</th>
+                                            <th style="width: 14%" class="text-center">HSN/SAC</th>
+                                            <th style="width: 18%" class="text-center">Quantity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="previewItemsBody">
+                                        <!-- Rendered dynamically -->
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="total-row-line">
+                                            <td class="text-center"><strong>0</strong></td>
+                                            <td></td>
+                                            <td class="text-right"><strong>Total</strong></td>
+                                            <td></td>
+                                            <td class="text-center"><strong id="previewTotalQty">1000</strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                            <!-- Amount Chargeable in Words Box -->
+                            <div class="grid-table-row border-top border-bottom words-row">
+                                <div class="words-label">Amount Chargeable (in words)</div>
+                                <div class="words-value" id="previewAmountWords">Ten Thousand Five Hundred E.&O.E</div>
+                            </div>
+
+                            <!-- Payment & Terms Grid -->
+                            <div class="grid-table-row border-bottom terms-row">
+                                <div class="terms-cell">
+                                    <div><strong>Mode/Terms of Payment :</strong> <span id="previewPaymentTerms">-</span></div>
+                                    <div style="margin-top: 6px;"><strong>Other References:</strong> <span id="previewOtherRef">-</span></div>
+                                </div>
+                            </div>
+
+                            <!-- Company Footer & Signatory Grid -->
+                            <div class="grid-table-row company-footer-row">
+                                <div class="footer-company-info">
+                                    <div class="company-heading">For <span id="previewCompanyName">HELP US GREEN LLP</span> <span id="previewCompanyAddressShort">C-8/3SITE-1 Industrial Area Panki, Kanpur- 208022 Uttar Pradesh -India</span></div>
+                                    <div class="company-tax">Company's GSTIN/UIN: <strong id="previewCompanyGstin">09AAMFH5783P1ZC</strong></div>
+                                    <div class="company-email">E-Mail: <span id="previewCompanyEmail">hello@helpusgreen.com</span></div>
+                                </div>
+
+                                <div class="footer-signatory-info">
+                                    <div class="sig-title">Authorised Signatory</div>
+                                    <div class="sig-name-box">
+                                        [<span id="previewSignatoryName">Karan Rastogi</span>]
+                                    </div>
+                                    <div class="sig-title-box">
+                                        [<span id="previewSignatoryTitle">Karan Rastogi</span>]
+                                    </div>
+                                    <div class="signature-display-container">
+                                        <img id="previewSignatureImg" src="Untitled.png" alt="Signature" style="display: block; max-height: 45px; max-width: 140px; margin-top: 4px; object-fit: contain;">
+                                        
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div> <!-- End gst-po-box -->
+
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
