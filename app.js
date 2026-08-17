@@ -409,14 +409,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const sigName = document.getElementById('previewSignatoryName').innerText;
         const sigTitle = document.getElementById('previewSignatoryTitle').innerText;
 
+        // Extract images
+        const logoSrc = document.getElementById('previewLogoImg').src;
+        const sigSrc = document.getElementById('previewSignatureImg').src;
+
         // Build the items rows for the Word document using the actual lineItems data
-        let itemsRows = '';
+        let itemsRowsHtml = '';
         lineItems.forEach((item, idx) => {
             const pkgs = escapeHtml(item.pkgs || '');
             const desc = escapeHtml(item.description || '');
             const hsn = escapeHtml(item.hsn || '');
             const qty = item.quantity || 0;
-            itemsRows += `
+            itemsRowsHtml += `
 <tr>
     <td class="text-center">${idx + 1}</td>
     <td>${pkgs}</td>
@@ -426,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </tr>`;
         });
         // Calculate total quantity (recomputed for safety)
-        const totalQty = lineItems.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
+        const totalQtyVal = lineItems.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
 
         // Build MS Word compatible HTML
         const wordDocHtml = `
@@ -464,6 +468,9 @@ document.addEventListener('DOMContentLoaded', () => {
             </head>
             <body>
                 <div style="text-align: center; margin-bottom: 8pt;">
+                    <div style="margin-bottom: 4pt;">
+                        <img src="${logoSrc}" height="50" style="max-height: 50px;" />
+                    </div>
                     <h1 style="font-size: 16pt; font-weight: bold; text-decoration: underline; margin: 0; padding: 0;">PURCHASE ORDER</h1>
                 </div>
                 <table class="main-gst-table">
@@ -506,7 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${itemsRows}
+                                    ${itemsRowsHtml}
                                     <tr style="height: 250pt;"><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
                                 </tbody>
                                 <tfoot>
@@ -515,7 +522,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <td></td>
                                         <td class="text-right"><strong>Total</strong></td>
                                         <td></td>
-                                        <td class="text-center"><strong>${totalQty}</strong></td>
+                                        <td class="text-center"><strong>${totalQtyVal}</strong></td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -550,7 +557,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <div style="font-weight: bold; font-size: 10pt;">Authorised Signatory</div>
                                         <div style="margin-top: 4pt;">[${sigName}]</div>
                                         <div>[${sigTitle}]</div>
-                                        <div style="font-family: 'Caveat', cursive; font-size: 18pt; color: #1e3a8a; margin-top: 8pt;">${sigName}</div>
+                                        <div style="margin-top: 4pt;">
+                                            <img src="${sigSrc}" height="45" style="max-height: 45px;" />
+                                        </div>
                                     </td>
                                 </tr>
                             </table>
