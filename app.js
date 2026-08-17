@@ -103,11 +103,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Preview Row matching reference image
             const trPreview = document.createElement('tr');
             trPreview.innerHTML = `
-                <td class="text-center">${index + 1}</td>
-                <td>${escapeHtml(item.pkgs || '')}</td>
-                <td><strong>${escapeHtml(item.description || '')}</strong></td>
-                <td class="text-center">${escapeHtml(item.hsn || '')}</td>
-                <td class="text-center">${item.quantity || 0}</td>
+                <td class="text-center" style="border-bottom: none;">${index + 1}</td>
+                <td style="border-bottom: none;">${escapeHtml(item.pkgs || '')}</td>
+                <td style="border-bottom: none;"><strong>${escapeHtml(item.description || '')}</strong></td>
+                <td class="text-center" style="border-bottom: none;">${escapeHtml(item.hsn || '')}</td>
+                <td class="text-center" style="border-bottom: none;">${item.quantity || 0}</td>
             `;
             previewItemsBody.appendChild(trPreview);
         });
@@ -116,11 +116,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const trSpacer = document.createElement('tr');
         trSpacer.style.height = '100%';
         trSpacer.innerHTML = `
-            <td style="border-bottom: none; border-top: none;"></td>
-            <td style="border-bottom: none; border-top: none;"></td>
-            <td style="border-bottom: none; border-top: none;"></td>
-            <td style="border-bottom: none; border-top: none;"></td>
-            <td style="border-bottom: none; border-top: none;"></td>
+            <td style="border-bottom: none; border-top: none;">&nbsp;</td>
+            <td style="border-bottom: none; border-top: none;">&nbsp;</td>
+            <td style="border-bottom: none; border-top: none;">&nbsp;</td>
+            <td style="border-bottom: none; border-top: none;">&nbsp;</td>
+            <td style="border-bottom: none; border-top: none;">&nbsp;</td>
         `;
         previewItemsBody.appendChild(trSpacer);
 
