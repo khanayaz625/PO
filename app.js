@@ -112,6 +112,18 @@ document.addEventListener('DOMContentLoaded', () => {
             previewItemsBody.appendChild(trPreview);
         });
 
+        // Add spacer row to ensure vertical borders stretch down in PDF (html2canvas fix)
+        const trSpacer = document.createElement('tr');
+        trSpacer.style.height = '100%';
+        trSpacer.innerHTML = `
+            <td style="border-bottom: none; border-top: none;"></td>
+            <td style="border-bottom: none; border-top: none;"></td>
+            <td style="border-bottom: none; border-top: none;"></td>
+            <td style="border-bottom: none; border-top: none;"></td>
+            <td style="border-bottom: none; border-top: none;"></td>
+        `;
+        previewItemsBody.appendChild(trSpacer);
+
         // Update Total Qty badge
         document.getElementById('previewTotalQty').textContent = totalQty;
 
