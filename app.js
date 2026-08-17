@@ -370,258 +370,194 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const btnDownloadDoc = document.getElementById('btnDownloadDoc');
 
-    if (btnDownloadDoc) {
-        btnDownloadDoc.addEventListener('click', () => {
-            const refNo = (document.getElementById('refNo').value || 'PurchaseOrder').replace(/[\/\\:]/g, '_');
+    btnDownloadDoc.addEventListener('click', () => {
+        const refNo = (document.getElementById('refNo').value || 'PurchaseOrder').replace(/[\\/\\:]/g, '_');
 
-            // Extract dynamic values for pristine Word Table generation
-            const supplierName = document.getElementById('previewSupplierName').innerText;
-            const supplierAddr = document.getElementById('previewSupplierAddress').innerText;
-            const supplierGstin = document.getElementById('previewSupplierGstin').innerText;
-            const supplierMob = document.getElementById('previewSupplierMobile').innerText;
+        // Extract dynamic values for Word generation
+        const supplierName = document.getElementById('previewSupplierName').innerText;
+        const supplierAddr = document.getElementById('previewSupplierAddress').innerText;
+        const supplierGstin = document.getElementById('previewSupplierGstin').innerText;
+        const supplierMob = document.getElementById('previewSupplierMobile').innerText;
 
-            const previewRef = document.getElementById('previewRefNo').innerText;
-            const poDate = document.getElementById('previewPoDate').innerText;
-            const buyerOrderNo = document.getElementById('previewBuyerOrderNo').innerText;
-            const buyerOrderDate = document.getElementById('previewBuyerOrderDate').innerText;
+        const previewRef = document.getElementById('previewRefNo').innerText;
+        const poDate = document.getElementById('previewPoDate').innerText;
+        const buyerOrderNo = document.getElementById('previewBuyerOrderNo').innerText;
+        const buyerOrderDate = document.getElementById('previewBuyerOrderDate').innerText;
 
-            const subject = document.getElementById('previewPoSubject').innerText;
-            const amountWords = document.getElementById('previewAmountWords').innerText;
-            const paymentTerms = document.getElementById('previewPaymentTerms').innerText;
-            const otherRef = document.getElementById('previewOtherRef').innerText;
+        const subject = document.getElementById('previewPoSubject').innerText;
+        const amountWords = document.getElementById('previewAmountWords').innerText;
+        const paymentTerms = document.getElementById('previewPaymentTerms').innerText;
+        const otherRef = document.getElementById('previewOtherRef').innerText;
 
-            const companyName = document.getElementById('previewCompanyName').innerText;
-            const companyAddr = document.getElementById('previewCompanyAddressShort').innerText;
-            const companyGstin = document.getElementById('previewCompanyGstin').innerText;
-            const companyEmail = document.getElementById('previewCompanyEmail').innerText;
+        const companyName = document.getElementById('previewCompanyName').innerText;
+        const companyAddr = document.getElementById('previewCompanyAddressShort').innerText;
+        const companyGstin = document.getElementById('previewCompanyGstin').innerText;
+        const companyEmail = document.getElementById('previewCompanyEmail').innerText;
 
-            const sigName = document.getElementById('previewSignatoryName').innerText;
-            const sigTitle = document.getElementById('previewSignatoryTitle').innerText;
+        const sigName = document.getElementById('previewSignatoryName').innerText;
+        const sigTitle = document.getElementById('previewSignatoryTitle').innerText;
 
-            // Extract line items table HTML
-            const itemsRows = document.getElementById('previewItemsBody').innerHTML;
-            const totalQty = document.getElementById('previewTotalQty').innerText;
-
-            // Build pure MS Word native <table> XML/HTML
-            const wordDocHtml = `
-                <html xmlns:o='urn:schemas-microsoft-com:office:office' 
-                      xmlns:w='urn:schemas-microsoft-com:office:word' 
-                      xmlns='http://www.w3.org/TR/REC-html40'>
-                <head>
-                    <meta charset='utf-8'>
-                    <!--[if gte mso 9]>
-                    <xml>
-                        <w:WordDocument>
-                            <w:View>Print</w:View>
-                            <w:Zoom>100</w:Zoom>
-                            <w:DoNotOptimizeForBrowser/>
-                        </w:WordDocument>
-                    </xml>
-                    <![endif]-->
-                    <style>
-                        @page { size: A4 portrait; margin: 15mm 15mm 15mm 15mm; }
-                        body { font-family: 'Times New Roman', serif; font-size: 11pt; color: #000; margin: 0; padding: 0; }
-                        
-                        /* Primary GST Outer Table */
-                        table.main-gst-table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            border: 2pt solid #000000;
-                        }
-                        
-                        table.main-gst-table > tbody > tr > td {
-                            border: 1pt solid #000000;
-                            padding: 0;
-                            vertical-align: top;
-                        }
-                        
-                        /* Header Inner Table */
-                        table.header-table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            border: none;
-                        }
-                        table.header-table td {
-                            border: 1pt solid #000000;
-                            padding: 6pt;
-                            vertical-align: top;
-                        }
-                        
-                        .title-bold { font-weight: bold; font-size: 12pt; }
-                        .text-sm { font-size: 10pt; }
-                        .text-center { text-align: center; }
-                        .text-right { text-align: right; }
-                        
-                        /* Goods Table */
-                        table.goods-table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            border: none;
-                        }
-                        table.goods-table th {
-                            border-bottom: 1pt solid #000;
-                            border-right: 1pt solid #000;
-                            padding: 5pt;
-                            font-size: 10pt;
-                            font-weight: bold;
-                            text-align: center;
-                            background-color: #f8fafc;
-                        }
-                        table.goods-table td {
-                            border-right: 1pt solid #000;
-                            padding: 5pt;
-                            font-size: 10.5pt;
-                            vertical-align: top;
-                        }
-                        table.goods-table th:last-child, table.goods-table td:last-child {
-                            border-right: none;
-                        }
-                        table.goods-table tfoot td {
-                            border-top: 1pt solid #000;
-                            border-bottom: 1pt solid #000;
-                            padding: 5pt;
-                            font-weight: bold;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <table class="main-gst-table">
-                        <!-- 1. Header Row -->
-                        <tr>
-                            <td style="width: 55%; padding: 6pt; border-right: 1pt solid #000;">
-                                <div class="text-sm">Supplier (Bill from)</div>
-                                <div class="title-bold">${supplierName}</div>
-                                <div class="text-sm">${supplierAddr.replace(/\n/g, '<br>')}</div>
-                                <div style="font-weight: bold; margin-top: 4pt;">GSTIN : ${supplierGstin}</div>
-                                <div style="font-weight: bold;">Mob: ${supplierMob}</div>
-                            </td>
-                            <td style="width: 45%; padding: 0;">
-                                <table class="header-table">
-                                    <tr>
-                                        <td style="width: 50%;">
-                                            <div class="text-sm">Ref:</div>
-                                            <div style="font-weight: bold;">${previewRef}</div>
-                                        </td>
-                                        <td style="width: 50%;">
-                                            <div class="text-sm">Dated:</div>
-                                            <div style="font-weight: bold;">${poDate}</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="text-sm">Buyer's Order No.</div>
-                                            <div style="font-weight: bold;">${buyerOrderNo}</div>
-                                        </td>
-                                        <td>
-                                            <div class="text-sm">Dated</div>
-                                            <div style="font-weight: bold;">${buyerOrderDate}</div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-
-                        <!-- 2. Subject Line Row -->
-                        <tr>
-                            <td colspan="2" style="padding: 6pt; border-top: 1pt solid #000; border-bottom: 1pt solid #000;">
-                                <strong>Subject:</strong> ${subject}
-                            </td>
-                        </tr>
-
-                        <!-- 3. Goods Itemized Table -->
-                        <tr>
-                            <td colspan="2" style="padding: 0; min-height: 300pt; vertical-align: top;">
-                                <table class="goods-table">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 8%;">Sl. No.</th>
-                                            <th style="width: 20%;">No. &Kind of Pkgs.</th>
-                                            <th style="width: 44%;">Description of Goods</th>
-                                            <th style="width: 14%;">HSN/SAC</th>
-                                            <th style="width: 14%;">Quantity</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${itemsRows}
-                                        <!-- Add extra blank row for height matching preview -->
-                                        <tr style="height: 180pt;">
-                                            <td></td><td></td><td></td><td></td><td></td>
-                                        </tr>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td class="text-center"><strong>0</strong></td>
-                                            <td></td>
-                                            <td class="text-right"><strong>Total</strong></td>
-                                            <td></td>
-                                            <td class="text-center"><strong>${totalQty}</strong></td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </td>
-                        </tr>
-
-                        <!-- 4. Amount Chargeable (in words) -->
-                        <tr>
-                            <td colspan="2" style="padding: 6pt; border-top: 1pt solid #000; border-bottom: 1pt solid #000;">
-                                <table style="width: 100%; border: none;">
-                                    <tr>
-                                        <td style="border: none; padding: 0; font-weight: bold; width: 40%;">Amount Chargeable (in words)</td>
-                                        <td style="border: none; padding: 0; font-weight: bold; text-align: right; font-style: italic;">${amountWords}</td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-
-                        <!-- 5. Payment & Terms Row -->
-                        <tr>
-                            <td colspan="2" style="padding: 6pt; border-bottom: 1pt solid #000;">
-                                <div><strong>Mode/Terms of Payment :</strong> ${paymentTerms}</div>
-                                <div style="margin-top: 4pt;"><strong>Other References:</strong> ${otherRef}</div>
-                            </td>
-                        </tr>
-
-                        <!-- 6. Company Footer & Authorised Signatory -->
-                        <tr>
-                            <td colspan="2" style="padding: 8pt;">
-                                <table style="width: 100%; border: none;">
-                                    <tr>
-                                        <td style="width: 60%; border: none; padding: 0; vertical-align: top;">
-                                            <div style="font-weight: bold;">For ${companyName} ${companyAddr}</div>
-                                            <div style="margin-top: 4pt;">Company's GSTIN/UIN: <strong>${companyGstin}</strong></div>
-                                            <div>E-Mail: ${companyEmail}</div>
-                                        </td>
-                                        <td style="width: 40%; border: none; padding: 0; text-align: center; vertical-align: top;">
-                                            <div style="font-weight: bold; font-size: 10pt;">Authorised Signatory</div>
-                                            <div style="margin-top: 4pt;">[${sigName}]</div>
-                                            <div>[${sigTitle}]</div>
-                                            <div style="font-family: 'Caveat', cursive; font-size: 18pt; color: #1e3a8a; margin-top: 8pt;">${sigName}</div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </body>
-                </html>
-            `;
-
-            // Create Blob with MS Word MIME type
-            const blob = new Blob(['\ufeff', wordDocHtml], {
-                type: 'application/msword'
-            });
-
-            // Trigger download
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${refNo}.doc`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+        // Build the items rows for the Word document using the actual lineItems data
+        let itemsRows = '';
+        lineItems.forEach((item, idx) => {
+            const pkgs = escapeHtml(item.pkgs || '');
+            const desc = escapeHtml(item.description || '');
+            const hsn = escapeHtml(item.hsn || '');
+            const qty = item.quantity || 0;
+            itemsRows += `
+<tr>
+    <td class="text-center">${idx + 1}</td>
+    <td>${pkgs}</td>
+    <td><strong>${desc}</strong></td>
+    <td class="text-center">${hsn}</td>
+    <td class="text-center">${qty}</td>
+</tr>`;
         });
-    }
+        // Calculate total quantity (recomputed for safety)
+        const totalQty = lineItems.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
+
+        // Build MS Word compatible HTML
+        const wordDocHtml = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+                  xmlns:w='urn:schemas-microsoft-com:office:word' 
+                  xmlns='http://www.w3.org/TR/REC-html40'>
+            <head>
+                <meta charset='utf-8'>
+                <!--[if gte mso 9]>
+                <xml>
+                    <w:WordDocument>
+                        <w:View>Print</w:View>
+                        <w:Zoom>100</w:Zoom>
+                        <w:DoNotOptimizeForBrowser/>
+                    </w:WordDocument>
+                </xml>
+                <![endif]-->
+                <style>
+                    @page { size: A4 portrait; margin: 15mm 15mm 15mm 15mm; }
+                    body { font-family: 'Times New Roman', serif; font-size: 11pt; color: #000; margin: 0; padding: 0; }
+                    table.main-gst-table { width: 100%; border-collapse: collapse; border: 2pt solid #000; }
+                    table.main-gst-table > tbody > tr > td { border: 1pt solid #000; padding: 0; vertical-align: top; }
+                    table.header-table { width: 100%; border-collapse: collapse; border: none; }
+                    table.header-table td { border: 1pt solid #000; padding: 6pt; vertical-align: top; }
+                    .title-bold { font-weight: bold; font-size: 12pt; }
+                    .text-sm { font-size: 10pt; }
+                    .text-center { text-align: center; }
+                    .text-right { text-align: right; }
+                    table.goods-table { width: 100%; border-collapse: collapse; border: none; }
+                    table.goods-table th { border-bottom: 1pt solid #000; border-right: 1pt solid #000; padding: 5pt; font-size: 10pt; font-weight: bold; text-align: center; background-color: #f8fafc; }
+                    table.goods-table td { border-right: 1pt solid #000; padding: 5pt; font-size: 10.5pt; vertical-align: top; }
+                    table.goods-table th:last-child, table.goods-table td:last-child { border-right: none; }
+                    table.goods-table tfoot td { border-top: 1pt solid #000; border-bottom: 1pt solid #000; padding: 5pt; font-weight: bold; }
+                </style>
+            </head>
+            <body>
+                <div style="text-align: center; margin-bottom: 8pt;">
+                    <h1 style="font-size: 16pt; font-weight: bold; text-decoration: underline; margin: 0; padding: 0;">PURCHASE ORDER</h1>
+                </div>
+                <table class="main-gst-table">
+                    <tr>
+                        <td style="width: 55%; padding: 6pt; border-right: 1pt solid #000;">
+                            <div class="text-sm">Supplier (Bill from)</div>
+                            <div class="title-bold">${supplierName}</div>
+                            <div class="text-sm">${supplierAddr.replace(/\n/g, '<br>')}</div>
+                            <div style="font-weight: bold; margin-top: 4pt;">GSTIN : ${supplierGstin}</div>
+                            <div style="font-weight: bold;">Mob: ${supplierMob}</div>
+                        </td>
+                        <td style="width: 45%; padding: 0;">
+                            <table class="header-table">
+                                <tr>
+                                    <td style="width: 50%;"><div class="text-sm">Ref:</div><div style="font-weight: bold;">${previewRef}</div></td>
+                                    <td style="width: 50%;"><div class="text-sm">Dated:</div><div style="font-weight: bold;">${poDate}</div></td>
+                                </tr>
+                                <tr>
+                                    <td><div class="text-sm">Buyer's Order No.</div><div style="font-weight: bold;">${buyerOrderNo}</div></td>
+                                    <td><div class="text-sm">Dated</div><div style="font-weight: bold;">${buyerOrderDate}</div></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="padding: 6pt; border-top: 1pt solid #000; border-bottom: 1pt solid #000;">
+                            <strong>Subject:</strong> ${subject}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="padding: 0; min-height: 300pt; vertical-align: top;">
+                            <table class="goods-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 8%;">Sl. No.</th>
+                                        <th style="width: 20%;">No. &amp;Kind of Pkgs.</th>
+                                        <th style="width: 44%;">Description of Goods</th>
+                                        <th style="width: 14%;">HSN/SAC</th>
+                                        <th style="width: 14%;">Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${itemsRows}
+                                    <tr style="height: 250pt;"><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td class="text-center"><strong>0</strong></td>
+                                        <td></td>
+                                        <td class="text-right"><strong>Total</strong></td>
+                                        <td></td>
+                                        <td class="text-center"><strong>${totalQty}</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="padding: 6pt; border-top: 1pt solid #000; border-bottom: 1pt solid #000;">
+                            <table style="width: 100%; border: none;">
+                                <tr>
+                                    <td style="border: none; padding: 0; font-weight: bold; width: 40%;">Amount Chargeable (in words)</td>
+                                    <td style="border: none; padding: 0; font-weight: bold; text-align: right; font-style: italic;">${amountWords}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="padding: 6pt; border-bottom: 1pt solid #000;">
+                            <div><strong>Mode/Terms of Payment :</strong> ${paymentTerms}</div>
+                            <div style="margin-top: 4pt;"><strong>Other References:</strong> ${otherRef}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="padding: 8pt;">
+                            <table style="width: 100%; border: none;">
+                                <tr>
+                                    <td style="width: 58%; border: none; padding: 0; vertical-align: top;">
+                                        <div style="font-weight: bold;">For ${companyName} ${companyAddr}</div>
+                                        <div style="margin-top: 4pt;">Company's GSTIN/UIN: <strong>${companyGstin}</strong></div>
+                                        <div>E-Mail: ${companyEmail}</div>
+                                    </td>
+                                    <td style="width: 38%; border: none; padding: 0; text-align: center; vertical-align: top;">
+                                        <div style="font-weight: bold; font-size: 10pt;">Authorised Signatory</div>
+                                        <div style="margin-top: 4pt;">[${sigName}]</div>
+                                        <div>[${sigTitle}]</div>
+                                        <div style="font-family: 'Caveat', cursive; font-size: 18pt; color: #1e3a8a; margin-top: 8pt;">${sigName}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+            </html>
+        `;
+        const blob = new Blob(['\ufeff', wordDocHtml], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${refNo}.doc`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
 
     function escapeHtml(str) {
         return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
